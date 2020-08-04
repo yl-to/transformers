@@ -115,13 +115,13 @@ class AlbertTextDataset(Dataset):
         for subfolder in os.listdir(file_dir):
             for file_name in os.listdir(os.path.join(file_dir, subfolder)):
                 file_path = os.path.join(file_dir, subfolder, file_name)
-                print(file_path)
                 assert os.path.isfile(file_path)
                 with open(file_path, encoding="utf-8") as f:
                     document = [tokenizer.convert_tokens_to_ids(tokenizer.tokenize(line)) 
                                 for line in f.read().splitlines() if (len(line) > 0 and not line.isspace())]
                     examples = self.create_examples_from_document(document, block_size, tokenizer)
                     self.examples.extend(examples)
+        logger.info(f"Dataset parse finished.")
 
     def create_examples_from_document(self, document, block_size, tokenizer, short_seq_prob=0.1):
         """Creates examples for a single document."""
