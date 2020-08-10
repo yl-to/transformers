@@ -113,8 +113,11 @@ class LineByLineWithSOPTextDataset(Dataset):
         self.examples = []
         # TODO: randomness could apply a random seed, ex. rng = random.Random(random_seed)
         # file path looks like ./dataset/AA/wiki00, ./dataset/BB/wiki01
-        folder_count = len(os.listdir(file_dir))
+        all_file_count = 0
         count = 0
+        for subfolder in os.listdir(file_dir):
+            all_file_count += len(os.listdir(os.path.join(file_dir, subfolder)))
+
         for subfolder in os.listdir(file_dir):
             for file_name in os.listdir(os.path.join(file_dir, subfolder)):
                 file_path = os.path.join(file_dir, subfolder, file_name)
@@ -137,8 +140,8 @@ class LineByLineWithSOPTextDataset(Dataset):
                         else:
                             if article_open:
                                 article_lines.append(line)
-            count += 1
-            print(f"folder finished {count}/{folder_count}")
+                count += 1
+                print(f"folder finished {count}/{all_file_count}")
 
         logger.info(f"Dataset parse finished.")
 
