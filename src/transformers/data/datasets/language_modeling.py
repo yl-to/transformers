@@ -117,9 +117,12 @@ class LineByLineWithSOPTextDataset(Dataset):
         count = 0
         for subfolder in os.listdir(file_dir):
             all_file_count += len(os.listdir(os.path.join(file_dir, subfolder)))
-
+        import time
+        import psutil
+        start_time = time.time()
         for subfolder in os.listdir(file_dir):
             for file_name in os.listdir(os.path.join(file_dir, subfolder)):
+                file_start_time = time.time()
                 file_path = os.path.join(file_dir, subfolder, file_name)
                 assert os.path.isfile(file_path)
                 article_open = False
@@ -131,17 +134,25 @@ class LineByLineWithSOPTextDataset(Dataset):
                             article_open = True
                         elif '</doc>' in line:
                             article_open = False
+                            conversion_start_time = time.time()
                             document = [tokenizer.convert_tokens_to_ids(tokenizer.tokenize(line)) 
                                         for line in article_lines[1:] if (len(line) > 0 and not line.isspace())]
-
+                            conversion_end_time = time.time()
+                            example_start = time.time()
                             examples = self.create_examples_from_document(document, block_size, tokenizer)
+                            example_end = time.time()
                             self.examples.extend(examples)
                             article_lines = []
                         else:
                             if article_open:
                                 article_lines.append(line)
+                file_end_time = time.time()
                 count += 1
-                print(f"folder finished {count}/{all_file_count}")
+                print(f"single file parse time {round(file_end_time - file_start_time)}")
+                print(f"token conversion time {round(conversion_end_time - conversion_start_time)}")
+                print(f"examples generation time {round(example_start - example_end)}")
+                print(f"virtual_memory usage {psutil.virtual_memory().percent}")
+                print(f"files finished {count}/{all_file_count}")
 
         logger.info(f"Dataset parse finished.")
 
