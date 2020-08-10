@@ -120,7 +120,6 @@ class LineByLineWithSOPTextDataset(Dataset):
                 file_path = os.path.join(file_dir, subfolder, file_name)
                 assert os.path.isfile(file_path)
                 article_open = False
-                print(current)
                 with open(file_path, encoding="utf-8") as f:
                     original_lines = f.readlines()
                     article_lines = []
