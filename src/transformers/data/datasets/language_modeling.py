@@ -121,56 +121,40 @@ class LineByLineWithSOPTextDataset(Dataset):
         import psutil
         start_time = time.time()
         for subfolder in os.listdir(file_dir):
-            print('probe1')
             for file_name in os.listdir(os.path.join(file_dir, subfolder)):
-                print('probe2')
                 file_start_time = time.time()
                 file_path = os.path.join(file_dir, subfolder, file_name)
                 assert os.path.isfile(file_path)
                 article_open = False
                 with open(file_path, encoding="utf-8") as f:
-                    print('probe3')
                     original_lines = f.readlines()
                     article_lines = []
                     for line in original_lines:
                         if '<doc id=' in line:
                             article_open = True
                         elif '</doc>' in line:
-                            if count > 450:
-                                print('probe5')
-                                print(f"virtual_memory usage {psutil.virtual_memory().percent}")
-                                print(f"current count is :{count}")
                             article_open = False
                             conversion_start_time = time.time()
-                            if count > 450:
-                                print('probe 8')
                             document = [tokenizer.convert_tokens_to_ids(tokenizer.tokenize(line)) 
                                         for line in article_lines[1:] if (len(line) > 0 and not line.isspace())]
                             conversion_end_time = time.time()
                             example_start = time.time()
-                            if count > 450:
-                                print('probe 9')
                             examples = self.create_examples_from_document(document, block_size, tokenizer)
-                            if count > 450:
-                                print('probe 10')
                             example_end = time.time()
                             self.examples.extend(examples)
                             article_lines = []
                         else:
                             if article_open:
                                 article_lines.append(line)
-                    print('probe6')
-                print('probe7')
                 file_end_time = time.time()
                 count += 1
                 print('------------------------------------------------------------------')
-                print(f"single file parse time {round(file_end_time - file_start_time)}")
-                print(f"token conversion time {round(conversion_end_time - conversion_start_time)}")
-                print(f"examples generation time {round(example_start - example_end)}")
+                print(f"single file parse time {file_end_time - file_start_time}")
+                print(f"token conversion time {conversion_end_time - conversion_start_time}")
+                print(f"examples generation time {example_start - example_end}")
                 print(f"virtual_memory usage {psutil.virtual_memory().percent}")
                 print(f"files finished {count}/{all_file_count}")
                 print('------------------------------------------------------------------')
-            print('probe8')
 
         logger.info(f"Dataset parse finished.")
 
@@ -200,7 +184,6 @@ class LineByLineWithSOPTextDataset(Dataset):
         current_chunk = [] # a buffer stored current working segments
         current_length = 0
         i = 0
-        print('------first while loop start------')
         while i < len(document):
             segment = document[i]  # get a segment
             current_chunk.append(segment)  # add a segment to current chunk
@@ -235,7 +218,6 @@ class LineByLineWithSOPTextDataset(Dataset):
 
                     def truncate_seq_pair(tokens_a, tokens_b, max_num_tokens):
                         """Truncates a pair of sequences to a maximum sequence length."""
-                        print('------second while loop start------')
                         while True:
                             total_length = len(tokens_a) + len(tokens_b)
                             if total_length <= max_num_tokens:
@@ -248,7 +230,6 @@ class LineByLineWithSOPTextDataset(Dataset):
                                 del trunc_tokens[0]
                             else:
                                 trunc_tokens.pop()
-                        print('------second while loop end------')
                     truncate_seq_pair(tokens_a, tokens_b, max_num_tokens)
                     assert len(tokens_a) >= 1
                     assert len(tokens_b) >= 1
@@ -266,7 +247,6 @@ class LineByLineWithSOPTextDataset(Dataset):
                 current_chunk = []  # clear current chunk
                 current_length = 0  # reset current text length
             i += 1  # go to next line
-        print('------first while loop end------')
         return examples
 
     def __len__(self):
