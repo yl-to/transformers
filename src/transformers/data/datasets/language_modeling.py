@@ -151,6 +151,8 @@ class LineByLineWithSOPTextDataset(Dataset):
                             if count > 450:
                                 print('probe 9')
                             examples = self.create_examples_from_document(document, block_size, tokenizer)
+                            if count > 450:
+                                print('probe 10')
                             example_end = time.time()
                             self.examples.extend(examples)
                             article_lines = []
@@ -198,6 +200,7 @@ class LineByLineWithSOPTextDataset(Dataset):
         current_chunk = [] # a buffer stored current working segments
         current_length = 0
         i = 0
+        print('------first while loop start------')
         while i < len(document):
             segment = document[i]  # get a segment
             current_chunk.append(segment)  # add a segment to current chunk
@@ -232,6 +235,7 @@ class LineByLineWithSOPTextDataset(Dataset):
 
                     def truncate_seq_pair(tokens_a, tokens_b, max_num_tokens):
                         """Truncates a pair of sequences to a maximum sequence length."""
+                        print('------second while loop start------')
                         while True:
                             total_length = len(tokens_a) + len(tokens_b)
                             if total_length <= max_num_tokens:
@@ -244,6 +248,7 @@ class LineByLineWithSOPTextDataset(Dataset):
                                 del trunc_tokens[0]
                             else:
                                 trunc_tokens.pop()
+                        print('------second while loop end------')
                     truncate_seq_pair(tokens_a, tokens_b, max_num_tokens)
                     assert len(tokens_a) >= 1
                     assert len(tokens_b) >= 1
@@ -261,6 +266,7 @@ class LineByLineWithSOPTextDataset(Dataset):
                 current_chunk = []  # clear current chunk
                 current_length = 0  # reset current text length
             i += 1  # go to next line
+        print('------first while loop end------')
         return examples
 
     def __len__(self):
