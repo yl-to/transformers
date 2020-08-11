@@ -133,17 +133,23 @@ class LineByLineWithSOPTextDataset(Dataset):
                     original_lines = f.readlines()
                     article_lines = []
                     for line in original_lines:
-                        print('probe4')
                         if '<doc id=' in line:
                             article_open = True
                         elif '</doc>' in line:
-                            print('probe5')
+                            if count > 450:
+                                print('probe5')
+                                print(f"virtual_memory usage {psutil.virtual_memory().percent}")
+                                print(f"current count is :{count}")
                             article_open = False
                             conversion_start_time = time.time()
+                            if count > 450:
+                                print('probe 8')
                             document = [tokenizer.convert_tokens_to_ids(tokenizer.tokenize(line)) 
                                         for line in article_lines[1:] if (len(line) > 0 and not line.isspace())]
                             conversion_end_time = time.time()
                             example_start = time.time()
+                            if count > 450:
+                                print('probe 9')
                             examples = self.create_examples_from_document(document, block_size, tokenizer)
                             example_end = time.time()
                             self.examples.extend(examples)
