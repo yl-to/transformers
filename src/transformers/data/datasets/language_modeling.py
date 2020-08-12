@@ -117,17 +117,16 @@ class LineByLineWithSOPTextDataset(Dataset):
         count = 0
         for subfolder in os.listdir(file_dir):
             all_file_count += len(os.listdir(os.path.join(file_dir, subfolder)))
+        print('DEBUG')
         import time
         import psutil
         start_time = time.time()
-        for subfolder in os.listdir(file_dir):
-            for file_name in os.listdir(os.path.join(file_dir, subfolder)):
+        dir_list = os.listdir(file_dir)
+        for i in range(len(dir_list)):
+            for file_name in os.listdir(os.path.join(file_dir, dir_list[i])):
                 file_start_time = time.time()
                 file_path = os.path.join(file_dir, subfolder, file_name)
                 assert os.path.isfile(file_path)
-                print('************************')
-                print(f"cur file path {file_path}")
-                print('************************')
                 article_open = False
                 with open(file_path, encoding="utf-8") as f:
                     original_lines = f.readlines()
@@ -142,7 +141,9 @@ class LineByLineWithSOPTextDataset(Dataset):
                                         for line in article_lines[1:] if (len(line) > 0 and not line.isspace())]
                             conversion_end_time = time.time()
                             example_start = time.time()
+                            print('DEBUG before func')
                             examples = self.create_examples_from_document(document, block_size, tokenizer)
+                            print('DEBUG after func')
                             example_end = time.time()
                             self.examples.extend(examples)
                             article_lines = []
@@ -190,6 +191,9 @@ class LineByLineWithSOPTextDataset(Dataset):
         i = 0
         while i < len(document):
             segment = document[i]  # get a segment
+            if not segment:
+                i += 1
+                continue
             current_chunk.append(segment)  # add a segment to current chunk
             current_length += len(segment)  # overall token length
             # if current length goes to the target length or reaches the end of file, start building token a and b
@@ -204,13 +208,12 @@ class LineByLineWithSOPTextDataset(Dataset):
                     tokens_a = []
                     for j in range(a_end):
                         tokens_a.extend(current_chunk[j])
-
                     # token b
                     tokens_b = []
                     for j in range(a_end, len(current_chunk)):
                         tokens_b.extend(current_chunk[j])
 
-                    if len(tokens_a) == 0 or len(tokens_b) == 0: 
+                    if len(tokens_a) == 0 or len(tokens_b) == 0:
                         continue
 
                     # switch tokens_a and tokens_b randomly
@@ -237,12 +240,10 @@ class LineByLineWithSOPTextDataset(Dataset):
                     truncate_seq_pair(tokens_a, tokens_b, max_num_tokens)
                     assert len(tokens_a) >= 1
                     assert len(tokens_b) >= 1
-
                     # add special tokens
                     input_ids = tokenizer.build_inputs_with_special_tokens(tokens_a, tokens_b)
                     # add token type ids, 0 for sentence a, 1 for sentence b
                     token_type_ids = tokenizer.create_token_type_ids_from_sequences(tokens_a, tokens_b)
-
                     example = {
                         "input_ids": torch.tensor(input_ids, dtype=torch.long),
                         "token_type_ids": torch.tensor(token_type_ids, dtype=torch.long),
@@ -251,6 +252,7 @@ class LineByLineWithSOPTextDataset(Dataset):
                 current_chunk = []  # clear current chunk
                 current_length = 0  # reset current text length
             i += 1  # go to next line
+        print('while end')
         return examples
 
     def __len__(self):
