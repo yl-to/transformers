@@ -125,6 +125,9 @@ class LineByLineWithSOPTextDataset(Dataset):
                 file_start_time = time.time()
                 file_path = os.path.join(file_dir, subfolder, file_name)
                 assert os.path.isfile(file_path)
+                print('************************')
+                print(f"cur file path {file_path}")
+                print('************************')
                 article_open = False
                 with open(file_path, encoding="utf-8") as f:
                     original_lines = f.readlines()
@@ -154,6 +157,7 @@ class LineByLineWithSOPTextDataset(Dataset):
                 print(f"examples generation time {example_start - example_end}")
                 print(f"virtual_memory usage {psutil.virtual_memory().percent}")
                 print(f"files finished {count}/{all_file_count}")
+
                 print('------------------------------------------------------------------')
 
         logger.info(f"Dataset parse finished.")
