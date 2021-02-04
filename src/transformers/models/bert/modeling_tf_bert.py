@@ -757,6 +757,15 @@ class TFBertMainLayer(tf.keras.layers.Layer):
             parameter_names = list(signature.keys())
             print(signature)
             print(parameter_names)
+        else:
+            print("---------find a None-buggy one-------")
+            print(self.call)
+            print(kwargs)
+            import inspect
+            signature = dict(inspect.signature(self.call).parameters)
+            parameter_names = list(signature.keys())
+            print(signature)
+            print(parameter_names)
         print('===============')
         if inputs["input_ids"] is not None and inputs["inputs_embeds"] is not None:
             raise ValueError("You cannot specify both input_ids and inputs_embeds at the same time")
