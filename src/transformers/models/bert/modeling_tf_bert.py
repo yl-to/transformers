@@ -725,6 +725,9 @@ class TFBertMainLayer(tf.keras.layers.Layer):
         training: bool = False,
         **kwargs,
     ) -> Union[TFBaseModelOutputWithPooling, Tuple[tf.Tensor]]:
+        print('***  before input_processing, the input id is: *** ')
+        print(input_ids)
+        print("***********")
         inputs = input_processing(
             func=self.call,
             config=self.config,
@@ -740,7 +743,9 @@ class TFBertMainLayer(tf.keras.layers.Layer):
             training=training,
             kwargs_call=kwargs,
         )
-
+        print('*** after input_processing, the input id is: *** ')
+        print(input_ids)
+        print("***********")
         if inputs["input_ids"] is not None and inputs["inputs_embeds"] is not None:
             raise ValueError("You cannot specify both input_ids and inputs_embeds at the same time")
         elif inputs["input_ids"] is not None:
