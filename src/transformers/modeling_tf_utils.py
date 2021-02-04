@@ -359,8 +359,13 @@ def input_processing(func, config, input_ids, **kwargs):
             output[k] = v
         else:
             raise ValueError(f"Data of type {type(v)} is not allowed only {allowed_types} is accepted for {k}.")
-
+    print("======= parameter_names is: ==========")
+    print(parameter_names)
+    print("=======kwargs.items==========")
+    print(kwargs.items())
+    print("============")
     if isinstance(input_ids, (tuple, list)):
+        print("input_processing ****** case 1 ******")
         for i, input in enumerate(input_ids):
             # EagerTensors don't allow to use the .name property so we check for a real Tensor
             if type(input) == tf.Tensor:
@@ -379,6 +384,7 @@ def input_processing(func, config, input_ids, **kwargs):
                     f"Data of type {type(input)} is not allowed only {allowed_types} is accepted for {parameter_names[i]}."
                 )
     elif isinstance(input_ids, (dict, BatchEncoding)):
+        print("input_processing ****** case 2 ******")
         if "inputs" in input_ids:
             warnings.warn(
                 "The `inputs` argument is deprecated and will be removed in a future version, use `input_ids` instead.",
@@ -405,6 +411,7 @@ def input_processing(func, config, input_ids, **kwargs):
             else:
                 raise ValueError(f"Data of type {type(v)} is not allowed only {allowed_types} is accepted for {k}.")
     else:
+        print("input_processing ****** case 3 ******")
         if isinstance(input_ids, tf.Tensor) or input_ids is None:
             output[parameter_names[0]] = input_ids
         else:
