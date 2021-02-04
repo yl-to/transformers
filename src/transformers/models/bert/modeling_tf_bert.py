@@ -743,8 +743,9 @@ class TFBertMainLayer(tf.keras.layers.Layer):
             training=training,
             kwargs_call=kwargs,
         )
-        print('*** after input_processing, the input id is: *** ')
-        print(input_ids)
+        print('*** after input_processing, the inputs is: *** ')
+        print(inputs)
+        print(inputs.keys)
         print("***********")
         if inputs["input_ids"] is not None and inputs["inputs_embeds"] is not None:
             raise ValueError("You cannot specify both input_ids and inputs_embeds at the same time")
