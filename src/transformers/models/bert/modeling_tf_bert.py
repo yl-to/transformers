@@ -753,7 +753,7 @@ class TFBertMainLayer(tf.keras.layers.Layer):
             print(input_ids)
             print(kwargs)
             import inspect
-            signature = dict(inspect.signature(func).parameters)
+            signature = dict(inspect.signature(self.call).parameters)
             parameter_names = list(signature.keys())
             print(signature)
             print(parameter_names)
