@@ -939,7 +939,8 @@ class Trainer:
                 else self.args.max_steps * self.args.gradient_accumulation_steps
             )
             self.control = self.callback_handler.on_epoch_begin(self.args, self.state, self.control)
-
+            count = 0
+            total_step_time = None
             for step, inputs in enumerate(epoch_iterator):
 
                 # Skip past any already trained steps if resuming training
@@ -950,6 +951,7 @@ class Trainer:
                 if (step + 1) % self.args.gradient_accumulation_steps == 0:
                     self.control = self.callback_handler.on_step_begin(self.args, self.state, self.control)
 
+                start_time = time.time()
                 if (
                     ((step + 1) % self.args.gradient_accumulation_steps != 0)
                     and self.args.local_rank != -1
@@ -960,6 +962,11 @@ class Trainer:
                         tr_loss += self.training_step(model, inputs)
                 else:
                     tr_loss += self.training_step(model, inputs)
+                end_time = time.time()
+                step_time = end_time - start_time
+                total_step_time += step_time
+                count += 1
+
                 self._total_flos += float(self.floating_point_ops(inputs))
 
                 if (step + 1) % self.args.gradient_accumulation_steps == 0 or (
@@ -1007,6 +1014,11 @@ class Trainer:
                 if self.control.should_epoch_stop or self.control.should_training_stop:
                     break
 
+            avg_step_time = total_step_time / count
+            print(f"******* Attention! *******")
+            print(f"total step is {count}")
+            print(f"average step time is {avg_step_time}")
+            print(f"******* Attention! *******")
             self.control = self.callback_handler.on_epoch_end(self.args, self.state, self.control)
             self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
 
