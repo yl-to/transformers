@@ -940,7 +940,7 @@ class Trainer:
             )
             self.control = self.callback_handler.on_epoch_begin(self.args, self.state, self.control)
             count = 0
-            total_step_time = None
+            total_step_time = 0
             for step, inputs in enumerate(epoch_iterator):
 
                 # Skip past any already trained steps if resuming training
