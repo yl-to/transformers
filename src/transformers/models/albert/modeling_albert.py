@@ -827,13 +827,14 @@ class AlbertForPreTraining(AlbertPreTrainedModel):
             total_loss = masked_lm_loss # + sentence_order_loss
 
         if not return_dict:
-            output = (prediction_scores, sop_scores) + outputs[2:]
+            # output = (prediction_scores, sop_scores) + outputs[2:]
+            output = (prediction_scores) + outputs[1:]
             return ((total_loss,) + output) if total_loss is not None else output
 
         return AlbertForPreTrainingOutput(
             loss=total_loss,
             prediction_logits=prediction_scores,
-            sop_logits=sop_scores,
+            sop_logits=None,
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
