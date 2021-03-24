@@ -742,7 +742,7 @@ class AlbertForPreTraining(AlbertPreTrainedModel):
 
         self.albert = AlbertModel(config)
         self.predictions = AlbertMLMHead(config)
-        self.sop_classifier = AlbertSOPHead(config)
+        # self.sop_classifier = AlbertSOPHead(config)
 
         self.init_weights()
 
@@ -812,17 +812,19 @@ class AlbertForPreTraining(AlbertPreTrainedModel):
             return_dict=return_dict,
         )
 
+
         sequence_output, pooled_output = outputs[:2]
 
         prediction_scores = self.predictions(sequence_output)
-        sop_scores = self.sop_classifier(pooled_output)
+        # sop_scores = self.sop_classifier(pooled_output)
 
         total_loss = None
-        if labels is not None and sentence_order_label is not None:
+        # if labels is not None and sentence_order_label is not None:
+        if labels is not None:
             loss_fct = CrossEntropyLoss()
             masked_lm_loss = loss_fct(prediction_scores.view(-1, self.config.vocab_size), labels.view(-1))
-            sentence_order_loss = loss_fct(sop_scores.view(-1, 2), sentence_order_label.view(-1))
-            total_loss = masked_lm_loss + sentence_order_loss
+            # sentence_order_loss = loss_fct(sop_scores.view(-1, 2), sentence_order_label.view(-1))
+            total_loss = masked_lm_loss # + sentence_order_loss
 
         if not return_dict:
             output = (prediction_scores, sop_scores) + outputs[2:]
