@@ -1063,6 +1063,7 @@ class Trainer:
         # number of training steps per epoch: num_update_steps_per_epoch
         # total number of training steps to execute: max_steps
         if train_dataset_is_sized:
+            print('first condtion')
             num_update_steps_per_epoch = len(train_dataloader) // args.gradient_accumulation_steps
             num_update_steps_per_epoch = max(num_update_steps_per_epoch, 1)
             if args.max_steps > 0:
@@ -1195,7 +1196,11 @@ class Trainer:
                 # We just need to begin an iteration to create the randomization of the sampler.
                 for _ in train_dataloader:
                     break
-
+        print('*************')
+        print(f'epochs_trained is {epochs_trained}')
+        print(f'num_train_epochs is {num_train_epochs}')
+        print('*************')
+        import sys; sys.exit()
         for epoch in range(epochs_trained, num_train_epochs):
             if isinstance(train_dataloader, DataLoader) and isinstance(train_dataloader.sampler, DistributedSampler):
                 train_dataloader.sampler.set_epoch(epoch)
@@ -1295,6 +1300,13 @@ class Trainer:
                     model.zero_grad()
                     self.state.global_step += 1
                     self.state.epoch = epoch + (step + 1) / steps_in_epoch
+                    print('******************************************')
+                    print(f'step is {step}!')
+                    print(f'(step + 1) / steps_in_epoch is {(step + 1) / steps_in_epoch}')
+                    print(f'steps_in_epoch is {steps_in_epoch}')
+                    print(f'self.state.global_step is {self.state.global_step}!')
+                    print(f'self.state.epoch is {self.state.epoch}!')
+                    print('******************************************')
                     self.control = self.callback_handler.on_step_end(args, self.state, self.control)
 
                     self._maybe_log_save_evaluate(tr_loss, model, trial, epoch)
