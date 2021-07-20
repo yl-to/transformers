@@ -794,6 +794,7 @@ class TrainingArguments:
             device = torch.device("cuda", local_rank)
             self._n_gpu = 1
         elif is_sagemaker_dp_enabled():
+            print("init process will be called")
             sm_dist.init_process_group()
             self.local_rank = sm_dist.get_local_rank()
             device = torch.device("cuda", self.local_rank)
