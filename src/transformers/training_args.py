@@ -1033,6 +1033,7 @@ class TrainingArguments:
                     elif is_sagemaker_dp_enabled():
                         sm_dist.barrier()
                     else:
+                        print('went to normal barrier')
                         torch.distributed.barrier()
                 yield
             finally:
