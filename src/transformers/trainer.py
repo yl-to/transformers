@@ -1231,7 +1231,7 @@ class Trainer:
 
                 if step % args.gradient_accumulation_steps == 0:
                     self.control = self.callback_handler.on_step_begin(args, self.state, self.control)
-
+                step_start_time = time.time()
                 if (
                     ((step + 1) % args.gradient_accumulation_steps != 0)
                     and args.local_rank != -1
@@ -1242,6 +1242,8 @@ class Trainer:
                         tr_loss += self.training_step(model, inputs)
                 else:
                     tr_loss += self.training_step(model, inputs)
+                step_time = time.time() - step_start_time
+                print(f'step {step}: step_time is {step_time}')
                 self.current_flos += float(self.floating_point_ops(inputs))
 
                 # Optimizer step for deepspeed must be called on every step regardless of the value of gradient_accumulation_steps
